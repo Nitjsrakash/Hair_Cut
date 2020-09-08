@@ -1,0 +1,12 @@
+{
+  "name": "Hair_Cut",
+  "displayName": "Hair_Cut",
+  "expo": {
+    "name": "Hair_Cut",
+    "slug": "Hair_Cut",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
