@@ -1,11 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
-import {Dimensions, StyleSheet,TouchableOpacity, Text,View,Image,Alert} from 'react-native';
+import {Dimensions, StyleSheet,TouchableOpacity, Text,View,Image,Alert,Modal} from 'react-native';
 import {Badge} from 'react-native-paper';
 import Constants from 'expo-constants';
 import {connect} from 'react-redux'
 import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoder/js/geocoder';
+import Loader from './ActivityIndicator/Loader'
+import ProfilePage from './Profile/ProfilePage';
+import NavigationService from '../NavigationService/NavigationService'
  
 var deviceHeight = Dimensions.get('window').height;
 var deviceWidth = Dimensions.get('window').width;
@@ -17,12 +20,16 @@ class HeadingPage extends Component {
     constructor() {
         super()
         this.state = {
+            loading: false,
             latitude: 0,
             longitude: 0,
             error: null,
             Address: null,
             getAddressValue: null,
             locationPermission:false,
+            visiable:false,
+            fname:'Akash',
+            lname:'Kumar',
         }
     }
     async componentDidMount() {
@@ -55,10 +62,19 @@ class HeadingPage extends Component {
             (error) => {
               // See error code charts below.
               Alert.alert(error.message)
+              this.setState({
+                  loading: false,
+                })
               console.log("Error:",error.code, error.message);
             },
             { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-        ); 
+        );
+  
+        setTimeout(() => {
+          this.setState({
+            loading: false,
+          });
+        },50);
     }
     renderAddCartComponent(value){
         if(value != 0) {
@@ -70,6 +86,9 @@ class HeadingPage extends Component {
         }
     }
     getAddress(){
+        this.setState({
+            loading: true
+          });
         Geolocation.getCurrentPosition(
           (position) => {
             this.setState({
@@ -94,23 +113,58 @@ class HeadingPage extends Component {
           (error) => {
             // See error code charts below.
             Alert.alert(error.message)
+            this.setState({
+                loading: false,
+              })
             console.log("Error:",error.code, error.message);
           },
           { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
       );
-    } 
+
+      setTimeout(() => {
+        this.setState({
+          loading: false,
+        });
+      },50);
+    }
+
+    getProfileModel(){
+        this.setState({
+            visiable:true
+        })
+    }
+    hideModel(visible) {
+        this.setState({
+            visiable: visible,
+        })
+    }
     render(){
         // console.log("Heading AddCartItem:",this.props.cartItem)
+        const cartItem  = this.props.cartItem
         return(
         <View style = {styles.headingView}>
-            <View style = {{height:100,width:deviceWidth,backgroundColor:'#FFFFFF',borderBottomLeftRadius:deviceWidth/5,borderBottomRightRadius:deviceWidth/5,borderColor:"#FFFFFF",}}>
+            <Loader
+                loading={this.state.loading} />
+             <Modal
+                transparent={true}
+                animationType={'none'}
+                visible={this.state.visiable}
+                onRequestClose={() => {this.hideModel(false)}}>
+             <ProfilePage 
+             fname = {this.state.fname}
+             lname = {this.state.lname}
+             closeDisplay={() => this.setState({visiable: false})}
+             />
+             </Modal>    
+                 
+            <View style = {{height:100,width:deviceWidth,backgroundColor:'#FFFFFF',borderBottomLeftRadius:deviceWidth/5,borderBottomRightRadius:deviceWidth/5,borderColor:"#FFFFFF",borderWidth:1}}>
                 <View style = {{height:50, width:deviceWidth,flexDirection:'row'}}>
                     <View style = {{ height:50, width:30}}>
                         <TouchableOpacity
-                          style = {styles.button}
+                          style = {StyleSheet.button}
                           onPress = {() => this.getAddress()}
                         >
-                            <Image  style = {{height:20,width:20,}}
+                            <Image  style = {{height:20,width:20,tintColor:'red'}}
                             source={require('../Assets/icons8-marker-50.png')} />
                         </TouchableOpacity>
                     </View>
@@ -134,7 +188,7 @@ class HeadingPage extends Component {
                             {this.renderAddCartComponent(this.props.cartItem.length)}
                             <TouchableOpacity
                                 style = {StyleSheet.button}
-                                onPress={() => this.props.navigation.navigate('PayMentPage')} 
+                                onPress={() => NavigationService.navigate('PayMentPage',{cartItem})} 
                                 >
                                 <Image  style = {{height:20,width:20,borderWidth:1, }}
                                             source={require('../Assets/Card.png')}
@@ -145,14 +199,18 @@ class HeadingPage extends Component {
                 </View>
                 <Image  style = {{height:80,width:100,bottom:-30,position: 'absolute',alignSelf:'center',borderRadius:5,}} 
                 source={require('../Assets/logoimage.jpg')}
-                />
-                <View style = {{width:120,bottom:-85, alignSelf:'center', flexDirection:'row',justifyContent:'space-between'}}>
-
-                    <Text style= {{textAlignVertical: "center",textAlign: "center",color:'black',fontSize:18,}}>Mark Robot</Text>
-                    <Image style = {{height:22,width:22,textAlignVertical: "center",textAlign: "center",color:'black',}}
-                    source={require('../Assets/icons8-expand-arrow-64.png')} />
-                </View>  
+                />  
             </View> 
+                <View style = {{width:120,bottom:-40, alignSelf:'center', flexDirection:'row',alignItems:'center'}}>
+                        <Text style= {{ textAlign:'center',color:'black',fontSize:18,}}>{this.state.fname} {this.state.lname}</Text>
+                    <TouchableOpacity
+                        style = {StyleSheet.button}
+                        onPress = {() => this.getProfileModel()}
+                     >
+                        <Image style = {{height:22,width:22,textAlignVertical: "center",textAlign: "center",color:'black',}}
+                        source={require('../Assets/icons8-expand-arrow-64.png')} />
+                    </TouchableOpacity>
+                </View> 
         </View>
         );
     }

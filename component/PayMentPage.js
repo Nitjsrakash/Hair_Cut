@@ -4,17 +4,18 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux'
 
 import {StyleSheet, Text,View,Image,TouchableOpacity,FlatList} from 'react-native';
+import MyHeader from './Custom/MyHeader';
 
 
 
 
 class PayMentPage extends Component {
     render(){
-         var data = this.props
-
-         console.log("Total Cart Item:",this.props.cartItem)
+      const item =this.props.navigation.getParam("cartItem", null)
+      console.log("Data:",item)
         return(
-          <View style = {{flexDirection:'row'}}>     
+          <View >   
+             <MyHeader noBack={false} title={"Cart Page"} isTransparent={false}/>  
               <Text>PayMent Page</Text>
           </View>
         );

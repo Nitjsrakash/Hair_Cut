@@ -22,7 +22,7 @@ class ListViewPage extends Component {
                 <View style={{height:35,width:110, backgroundColor:'black',borderRadius:35/2 ,flexDirection:'row',margin:1,justifyContent: "center",alignItems: "center"}}>
                     <TouchableOpacity
                         style={StyleSheet.button}
-                    onPress={() => navigation.navigate('Detail',{ itemData: itemValue })}
+                    onPress={() => NavigationService.navigate('DetailPage',{itemValue} )}
                     >
                     <Text style= {{textAlignVertical: "center",textAlign: "center",color:'white',fontSize:15,fontWeight: 'bold'}}> View Detail</Text>
                     </TouchableOpacity>
